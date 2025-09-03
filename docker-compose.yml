@@ -1,0 +1,13 @@
+networks:
+  default:
+    driver: bridge
+
+
+services:
+  delivery:
+    build: .
+    environment:
+      - SPRING_PROFILE_ACTIVE=default
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
