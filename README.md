@@ -1,11 +1,11 @@
-🚀 Delivery Tech API
+# 🚀 Delivery Tech API
 
 Sistema de delivery moderno desenvolvido com Spring Boot 3.2.x e Java 21, utilizando as mais recentes funcionalidades da linguagem.
 
-📋Sobre o Projeto - GCP
+# 📋Sobre o Projeto - GCP
 Este projeto foi desenvolvido como parte da disciplina Arquitetura de Sistemas e representa a base de um sistema de delivery completo. A aplicação demonstra o uso de tecnologias modernas e boas práticas de desenvolvimento.
 
-🛠️ Tecnologias Utilizadas
+# 🛠️ Tecnologias Utilizadas
 Core
 Java 21 LTS - Versão mais recente com recursos modernos
 Spring Boot 3.2.x - Framework principal
@@ -16,3 +16,15 @@ Spring Data JPA - Persistência de dados
 H2 Database - Banco em memória para desenvolvimento
 Spring Boot DevTools - Ferramentas de desenvolvimento
 Lombok - Anotações
+
+# Executar aplicação
+mvn spring-boot:run
+
+# Executar testes
+mvn test
+
+# Relatório Jacoco
+mvn jacoco:report
+
+# Subir monitoramento
+docker-compose -f monitoring/docker-compose.yml up -d
