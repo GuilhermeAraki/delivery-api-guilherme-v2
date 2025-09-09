@@ -3,6 +3,8 @@ package com.deliverytech.delivery.controller;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,10 +31,12 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClienteController {
 
+    @Autowired
     private final ClienteService clienteService;
 
     @PostMapping
     @Operation(summary = "Cadastra um cliente")
+    @CacheEvict(value = "clientes", allEntries = true)
     public ResponseEntity<ClienteResponse> cadastrar(@Valid @RequestBody ClienteRequest request) {
         Cliente cliente = Cliente.builder()
                 .nome(request.getNome())
@@ -46,6 +50,7 @@ public class ClienteController {
 
     @GetMapping
     @Operation(summary = "Listar todos os clientes", description = "Retorna uma lista de todos os clientes")
+    @Cacheable(value = "clientes")
     public List<ClienteResponse> listar() {
         return clienteService.listarAtivos().stream()
                 .map(c -> new ClienteResponse(c.getId(), c.getNome(), c.getEmail(), c.getAtivo()))
@@ -54,6 +59,7 @@ public class ClienteController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Listar o cliente por ID ", description = "Retorna o cliente definido pelo ID")
+    @Cacheable(value = "clientes", key = "#id")
     public ResponseEntity<ClienteResponse> buscar(@PathVariable Long id) {
         return clienteService.buscarPorId(id)
                 .map(c -> new ClienteResponse(c.getId(), c.getNome(), c.getEmail(), c.getAtivo()))
@@ -63,6 +69,7 @@ public class ClienteController {
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza dados do cliente", description = "Atualiza dados de um cliente definindo pelo ID")
+    @CacheEvict(value = "clientes", allEntries = true)
     public ResponseEntity<ClienteResponse> atualizar(@PathVariable Long id,
             @Valid @RequestBody ClienteRequest request) {
         Cliente atualizado = Cliente.builder()
@@ -76,6 +83,7 @@ public class ClienteController {
 
     @PatchMapping("/{id}/status")
     @Operation(summary = "Altera o status de um cliente")
+    @CacheEvict(value = "clientes", allEntries = true)
     public ResponseEntity<Void> ativarDesativar(@PathVariable Long id) {
         clienteService.ativarDesativar(id);
         return ResponseEntity.noContent().build();
