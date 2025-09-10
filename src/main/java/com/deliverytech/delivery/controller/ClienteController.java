@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.deliverytech.delivery.dto.request.ClienteRequest;
 import com.deliverytech.delivery.dto.response.ClienteResponse;
@@ -31,23 +32,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ClienteController {
 
-    @Autowired
     private final ClienteService clienteService;
 
     @PostMapping
-    @Operation(summary = "Cadastra um cliente")
-    @CacheEvict(value = "clientes", allEntries = true)
-    public ResponseEntity<ClienteResponse> cadastrar(@Valid @RequestBody ClienteRequest request) {
-        Cliente cliente = Cliente.builder()
-                .nome(request.getNome())
-                .email(request.getEmail())
-                .ativo(true)
-                .build();
-        Cliente salvo = clienteService.cadastrar(cliente);
-        return ResponseEntity
-                .ok(new ClienteResponse(salvo.getId(), salvo.getNome(), salvo.getEmail(), salvo.getAtivo()));
-    }
-
     @GetMapping
     @Operation(summary = "Listar todos os clientes", description = "Retorna uma lista de todos os clientes")
     @Cacheable(value = "clientes")
@@ -57,18 +44,9 @@ public class ClienteController {
                 .collect(Collectors.toList());
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Listar o cliente por ID ", description = "Retorna o cliente definido pelo ID")
-    @Cacheable(value = "clientes", key = "#id")
-    public ResponseEntity<ClienteResponse> buscar(@PathVariable Long id) {
-        return clienteService.buscarPorId(id)
-                .map(c -> new ClienteResponse(c.getId(), c.getNome(), c.getEmail(), c.getAtivo()))
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
     @PutMapping("/{id}")
     @Operation(summary = "Atualiza dados do cliente", description = "Atualiza dados de um cliente definindo pelo ID")
+    @CachePut(value = "cliente", key = "#id")
     @CacheEvict(value = "clientes", allEntries = true)
     public ResponseEntity<ClienteResponse> atualizar(@PathVariable Long id,
             @Valid @RequestBody ClienteRequest request) {
